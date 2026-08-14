@@ -69,7 +69,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     </div>
 
     <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
-    <div class="note"><b>V8:</b> Chỉ còn roast cực mạnh, câu ngắn, voice nhanh và gắt hơn.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+    <div class="note"><b>V9:</b> Voice 1.25x, ưu tiên giọng nam tiếng Việt, pitch trầm hơn.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
   </section>
 
   <section class="words">
@@ -77,7 +77,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     <div class="grid" id="grid"></div>
   </section>
 
-  <footer>English Roast V8 · Extreme Roast Only</footer>
+  <footer>English Roast V9 · Male Voice 1.25x</footer>
 </main>
 
 <script>
@@ -159,20 +159,24 @@ function findVietnameseVoice(){
   if(!("speechSynthesis" in window)) return null;
   const voices = speechSynthesis.getVoices() || [];
 
-  const preferred = [
+  const malePriority = [
     /NamMinh/i,
+    /Microsoft.*Nam/i,
     /Vietnamese.*Male/i,
-    /male.*Vietnamese/i,
-    /Google Tiếng Việt/i,
-    /Tiếng Việt/i,
-    /Vietnamese/i
+    /Male.*Vietnamese/i,
+    /Male/i,
+    /Nam/i
   ];
 
-  for(const rule of preferred){
-    const found = voices.find(v => rule.test((v.name||"") + " " + (v.lang||"")));
+  for(const rule of malePriority){
+    const found = voices.find(v =>
+      /^vi(-|_)/i.test(v.lang || "") &&
+      rule.test((v.name || "") + " " + (v.lang || ""))
+    );
     if(found) return found;
   }
 
+  // If no explicitly male Vietnamese voice exists, fall back to any Vietnamese voice.
   return (
     voices.find(v => /^vi(-|_)/i.test(v.lang || "")) ||
     voices.find(v => /vietnam|tiếng việt|tieng viet/i.test((v.name || "") + " " + (v.lang || ""))) ||
@@ -209,8 +213,8 @@ function speakFeedback(text){
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "vi-VN";
-  utter.rate = 1.42;
-  utter.pitch = 0.88;
+  utter.rate = 1.25;
+  utter.pitch = 0.82;
   utter.volume = 1;
 
   const vi = findVietnameseVoice();
@@ -224,8 +228,8 @@ function speakFeedback(text){
     try{
       const fallback = new SpeechSynthesisUtterance(text);
       fallback.lang = "vi-VN";
-      fallback.rate = 1.38;
-      fallback.pitch = 0.88;
+      fallback.rate = 1.25;
+      fallback.pitch = 0.82;
       fallback.volume = 1;
       speechSynthesis.speak(fallback);
     }catch(e){}

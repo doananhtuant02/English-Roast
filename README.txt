@@ -1,15 +1,14 @@
-ENGLISH ROAST V8 - EXTREME ROAST ONLY
+ENGLISH ROAST V9 - MALE VOICE 1.25X
 
 Thay đổi:
-- Xóa các câu cà khịa nhẹ.
-- Chỉ giữ roast cực mạnh, trực diện, có tục.
-- Câu ngắn hơn để voice đọc có lực.
-- Tăng tốc voice lên khoảng 1.42x.
-- Hạ pitch nhẹ để giọng gắt hơn.
-- Phản hồi gần như ngay sau khi mic đóng.
+- Voice rate: 1.25x.
+- Ưu tiên voice nam tiếng Việt.
+- Ưu tiên tên voice kiểu NamMinh / Male / Nam.
+- Pitch hạ xuống khoảng 0.82 để giọng trầm hơn.
+- Nếu máy không có voice nam tiếng Việt, web fallback sang voice tiếng Việt có sẵn.
 
 Cập nhật GitHub:
-1. Thay index.html cũ bằng index.html V8.
+1. Thay index.html cũ bằng index.html V9.
 2. Commit changes.
 3. Chờ GitHub Pages deploy.
-4. Mở tab mới trên điện thoại/máy tính.
+4. Mở lại website bằng tab mới.
