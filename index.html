@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>English Roast 🔥</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#0c111b;--panel:#141d2a;--panel2:#1a2637;--line:#2a394f;
+  --text:#f7f9fc;--muted:#91a0b5;--blue:#4e89ff;--red:#ff5964;
+  --green:#48d17d;--yellow:#f9c74f;
+}
+html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}
+body{background:radial-gradient(circle at 15% 8%,rgba(78,137,255,.15),transparent 28rem),radial-gradient(circle at 90% 40%,rgba(255,89,100,.09),transparent 23rem),var(--bg)}
+button{font:inherit}.app{width:min(920px,calc(100% - 24px));margin:auto;padding:18px 0 34px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#4e89ff,#795fff);display:grid;place-items:center;font-weight:950}
+.brand strong{display:block}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:2px}.score{padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font-weight:800;font-size:12px}.score b{color:var(--yellow);font-size:17px}
+.card{position:relative;overflow:hidden;min-height:560px;padding:26px 22px;display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:25px;background:linear-gradient(180deg,#1a2638,#0f1723);box-shadow:0 28px 70px rgba(0,0,0,.27)}
+.mascot{position:relative;width:150px;height:170px;margin:2px auto 10px;transition:.18s}
+.face{position:absolute;left:20px;top:13px;width:110px;height:110px;border-radius:47%;background:#56b9ff;border:6px solid #2d88d4}
+.ear{position:absolute;top:48px;width:32px;height:46px;border-radius:50%;background:#56b9ff;border:6px solid #2d88d4;z-index:-1}.ear.l{left:3px}.ear.r{right:3px}
+.eye{position:absolute;top:36px;width:17px;height:23px;border-radius:50%;background:#fff}.eye:after{content:"";position:absolute;left:5px;top:6px;width:7px;height:11px;border-radius:50%;background:#17304a}.eye.l{left:27px}.eye.r{right:27px}
+.mouth{position:absolute;left:42px;top:73px;width:27px;height:17px;border-bottom:5px solid #173854;border-radius:0 0 30px 30px}
+.body{position:absolute;left:32px;bottom:0;width:86px;height:65px;border-radius:30px 30px 16px 16px;background:#f04b5d}
+.mascot.angry{transform:rotate(-3deg) scale(1.03)}.mascot.angry .eye{height:14px;border-radius:4px;top:42px}
+.bubble{width:min(560px,100%);padding:17px 18px;text-align:center;border:1px solid #31445e;border-radius:18px;background:#0d151f}
+.kicker{font-size:8px;font-weight:950;letter-spacing:1.5px;color:#8fa1ba}.word{margin:7px 0 2px;font-size:clamp(34px,8vw,54px);line-height:1;letter-spacing:-1px}.hint{margin:8px 0 0;color:#80b1ff;font-size:13px;font-weight:850}.meaning{margin:5px 0 0;color:#9facc0;font-size:11px}
+.result{width:min(650px,100%);min-height:66px;margin:15px 0 8px;padding:12px 15px;display:grid;place-items:center;text-align:center;border:1px dashed #364a64;border-radius:14px;background:#101925;color:#c7d0dd;font-weight:700;line-height:1.45}
+.result.good{border-color:rgba(72,209,125,.55);background:rgba(72,209,125,.1);color:#94efb4}.result.bad{border-color:rgba(255,89,100,.5);background:rgba(255,89,100,.1);color:#ff9da4;font-size:16px}
+.actions{display:flex;align-items:center;justify-content:center;gap:11px;margin-top:5px}.btn{min-height:44px;padding:0 15px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:#eef3fa;font-weight:850;cursor:pointer}.btn:hover{filter:brightness(1.08)}
+.mic{width:72px;height:72px;border:0;border-radius:50%;background:linear-gradient(135deg,#ff5964,#e93d4e);color:#fff;font-size:28px;cursor:pointer;box-shadow:0 12px 28px rgba(255,89,100,.26)}.mic.listening{background:linear-gradient(135deg,#48d17d,#23ad5d);animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(72,209,125,.08)}}
+.diag{width:min(650px,100%);margin-top:13px;padding:10px 12px;border-radius:12px;background:#0d151f;border:1px solid #27364a;color:#718198;font-size:10px;line-height:1.5;text-align:center}
+.diag.ok{color:#88d9a5;border-color:#27533a}.diag.err{color:#f29ba2;border-color:#5c2e34}
+.words{padding:25px 0}.words h2{margin:0 0 12px;font-size:20px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.item{padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:#e9eef5;text-align:left;cursor:pointer}.item.active,.item:hover{background:#1a2941;border-color:#4e89ff}.item strong{display:block;font-size:13px}.item small{display:block;color:#8392a7;font-size:9px;margin-top:3px}
+.note{padding:13px 14px;border:1px solid #493a23;border-radius:13px;background:#221b12;color:#d8bd87;font-size:10px;line-height:1.6;margin-top:12px}
+footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
+@media(max-width:680px){.card{padding:20px 13px}.mascot{transform:scale(.9);margin:-4px auto 0}.actions{width:100%;display:grid;grid-template-columns:1fr 66px 1fr;gap:7px}.btn{font-size:10px;padding:0 7px}.mic{width:62px;height:62px;font-size:24px}.grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">ER</div><div><strong>English Roast</strong><small>Đọc sai là bị cà khịa 😈</small></div></div>
+    <div class="score"><b id="score">0</b> điểm</div>
+  </header>
+
+  <section class="card">
+    <div class="mascot" id="mascot">
+      <div class="ear l"></div><div class="ear r"></div>
+      <div class="face"><div class="eye l"></div><div class="eye r"></div><div class="mouth"></div></div>
+      <div class="body"></div>
+    </div>
+
+    <div class="bubble">
+      <div class="kicker">THỬ ĐỌC TỪ NÀY</div>
+      <h1 class="word" id="word"></h1>
+      <div class="hint" id="hint"></div>
+      <div class="meaning" id="meaning"></div>
+    </div>
+
+    <div class="result" id="result">Bấm micro và đọc từ phía trên.</div>
+
+    <div class="actions">
+      <button class="btn" id="listenBtn">🔊 Nghe mẫu</button>
+      <button class="mic" id="micBtn" title="Bấm để nói">🎙️</button>
+      <button class="btn" id="nextBtn">Từ khác →</button>
+    </div>
+
+    <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
+    <div class="note">Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+  </section>
+
+  <section class="words">
+    <h2>Chọn từ để luyện</h2>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>English Roast V2 · Live Server Edition</footer>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+const lessons=[
+["comfortable","COMF-tuh-buhl","thoải mái"],
+["vegetable","VEJ-tuh-buhl","rau củ"],
+["world","wurld","thế giới"],
+["three","three","số ba"],
+["think","think","suy nghĩ"],
+["usually","YOO-zhoo-uh-lee","thường xuyên"],
+["restaurant","RES-tuh-ront","nhà hàng"],
+["clothes","klohz","quần áo"],
+["schedule","SKED-jool","lịch trình"],
+["environment","en-VY-run-ment","môi trường"],
+["especially","es-PESH-uh-lee","đặc biệt"],
+["development","di-VEL-up-ment","sự phát triển"]
+];
+
+const roasts=[
+"Đọc lại đi cha nội 💀 Tiếng Anh chứ không phải thần chú gọi hồn.",
+"Ủa alo? Từ gốc một đường, ông đọc một nẻo vậy 😭",
+"Sai rồi má ơi 😭 Nghe mẫu lại rồi chiến tiếp.",
+"Cái miệng hôm nay phản chủ dữ vậy 😭",
+"Từ này bị ông hành tới mức nó muốn đổi quốc tịch luôn rồi.",
+"Ủa mình học tiếng Anh hay vừa phát minh ngôn ngữ mới vậy?",
+"Cú phát âm này hơi báo nha 💀 Làm lại!",
+"Người Anh nghe cú này chắc phải bật phụ đề 😭"
+];
+const praise=["Chuẩn bài 😎","Ngon! 🔥","Ổn áp rồi đó.","Được đấy, qua từ tiếp!","Yes! Không bị chửi nữa 😌"];
+
+let current=0,score=0,recognition=null,busy=false;
+const $=id=>document.getElementById(id);
+const result=$("result"),diag=$("diag"),mic=$("micBtn"),mascot=$("mascot");
+
+function lesson(){return lessons[current]}
+function render(){
+ const x=lesson();
+ $("word").textContent=x[0];$("hint").textContent=x[1];$("meaning").textContent=x[2];
+ result.className="result";result.textContent="Bấm micro và đọc từ phía trên.";mascot.className="mascot";
+ $("grid").innerHTML=lessons.map((x,i)=>`<button class="item ${i===current?"active":""}" data-i="${i}"><strong>${x[0]}</strong><small>${x[2]}</small></button>`).join("");
+ document.querySelectorAll(".item").forEach(b=>b.onclick=()=>{current=+b.dataset.i;render();scrollTo({top:0,behavior:"smooth"})});
+}
+function next(){current=(current+1)%lessons.length;render()}
+function normalize(s){return(s||"").toLowerCase().replace(/[^a-z\\s]/g,"").replace(/\\s+/g," ").trim()}
+function sim(a,b){
+ a=normalize(a);b=normalize(b);if(a===b)return 1;
+ const m=a.length,n=b.length,d=Array.from({length:m+1},()=>Array(n+1).fill(0));
+ for(let i=0;i<=m;i++)d[i][0]=i;for(let j=0;j<=n;j++)d[0][j]=j;
+ for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+ return 1-d[m][n]/Math.max(m,n,1);
+}
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+
+function diagnostics(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ const secure=window.isSecureContext;
+ const media=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
+ if(SR&&secure&&media){
+   diag.className="diag ok";
+   diag.textContent="✅ Sẵn sàng: trình duyệt hỗ trợ mic + Speech Recognition.";
+ }else{
+   diag.className="diag err";
+   const issues=[];
+   if(!SR)issues.push("không có SpeechRecognition");
+   if(!secure)issues.push("không phải secure context");
+   if(!media)issues.push("không có getUserMedia");
+   diag.textContent="⚠️ "+issues.join(" · ")+" — hãy dùng Chrome/Edge trên Live Server.";
+ }
+ return !!SR;
+}
+
+async function ensureMicPermission(){
+ if(!navigator.mediaDevices?.getUserMedia) throw new Error("Browser không hỗ trợ microphone API.");
+ const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+ stream.getTracks().forEach(t=>t.stop());
+}
+
+function makeRecognition(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR)return null;
+ const r=new SR();
+ r.lang="en-US";
+ r.interimResults=false;
+ r.continuous=false;
+ r.maxAlternatives=5;
+ r.onstart=()=>{busy=true;mic.classList.add("listening");result.className="result";result.textContent="🎧 Đang nghe... đọc ngay đi!";};
+ r.onend=()=>{busy=false;mic.classList.remove("listening")};
+ r.onerror=e=>{
+   busy=false;mic.classList.remove("listening");result.className="result bad";
+   const map={
+    "not-allowed":"Micro đang bị chặn. Bấm ổ khóa cạnh URL → Microphone → Allow.",
+    "audio-capture":"Không tìm thấy microphone.",
+    "network":"Speech Recognition cần kết nối mạng. Kiểm tra Internet rồi thử lại.",
+    "no-speech":"Tôi chưa nghe thấy gì 😭 Nói to hơn một chút.",
+    "aborted":"Đã dừng nghe."
+   };
+   result.textContent=map[e.error]||("Lỗi nhận giọng nói: "+e.error);
+ };
+ r.onresult=e=>{
+   const alts=[];
+   for(let i=0;i<e.results[0].length;i++)alts.push(e.results[0][i].transcript);
+   const target=lesson()[0];
+   const best=alts.map(t=>({text:t,score:sim(t,target)})).sort((a,b)=>b.score-a.score)[0]||{text:"",score:0};
+   if(best.score>=.72){
+     score+=10;$("score").textContent=score;result.className="result good";
+     result.innerHTML=`✅ Tôi nghe: <strong>${best.text}</strong><br>${rnd(praise)}`;
+     mascot.className="mascot";
+     setTimeout(next,1700);
+   }else{
+     result.className="result bad";
+     result.innerHTML=`❌ Tôi nghe: <strong>${best.text||"???"}</strong><br>${rnd(roasts)}`;
+     mascot.className="mascot angry";
+   }
+ };
+ return r;
+}
+
+$("listenBtn").onclick=()=>{
+ if(!("speechSynthesis" in window)){result.className="result bad";result.textContent="Trình duyệt không hỗ trợ đọc mẫu.";return}
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(lesson()[0]);u.lang="en-US";u.rate=.72;u.pitch=1;
+ speechSynthesis.speak(u);
+};
+
+$("nextBtn").onclick=next;
+
+mic.onclick=async()=>{
+ if(busy)return;
+ if(!diagnostics()){
+   result.className="result bad";
+   result.textContent="Chrome/Edge mới hỗ trợ tính năng mic của bản demo này.";
+   return;
+ }
+ try{
+   result.className="result";result.textContent="Đang xin quyền microphone...";
+   await ensureMicPermission();
+   if(!recognition)recognition=makeRecognition();
+   recognition.start();
+ }catch(err){
+   result.className="result bad";
+   result.textContent="Không mở được micro: "+(err.message||err)+". Kiểm tra quyền Microphone của trình duyệt.";
+ }
+};
+
+diagnostics();
+render();
+});
+</script>
+</body>
+</html>
