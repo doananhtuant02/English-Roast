@@ -69,7 +69,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     </div>
 
     <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
-    <div class="note"><b>V7:</b> Roast mạnh hơn, voice nhanh và gắt hơn, phản hồi gần như ngay sau khi mic đóng.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+    <div class="note"><b>V8:</b> Chỉ còn roast cực mạnh, câu ngắn, voice nhanh và gắt hơn.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
   </section>
 
   <section class="words">
@@ -77,7 +77,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     <div class="grid" id="grid"></div>
   </section>
 
-  <footer>English Roast V7 · Hard Roast</footer>
+  <footer>English Roast V8 · Extreme Roast Only</footer>
 </main>
 
 <script>
@@ -98,26 +98,26 @@ const lessons=[
 ];
 
 const roasts=[
-"Địt mẹ, đọc cái gì vậy trời? Đọc lại!",
-"Vãi cả phát âm. Từ có một chữ mà ông bẻ thành ba chữ luôn rồi.",
-"Ông đọc kiểu này người ta nghe xong tưởng mạng lag đấy.",
-"Đọc lại đi cha nội. Cái miệng đừng có tự chế tiếng Anh nữa.",
-"Trời ơi, phát âm như này mà đi gọi đồ ăn là nhịn đói luôn.",
-"Vãi chưởng, từ này bị ông hành đến biến dạng luôn rồi.",
-"Không. Sai bét. Nghe lại rồi đọc cho đàng hoàng.",
-"Ủa alo? Đây là tiếng Anh, không phải mật mã hành tinh khác.",
-"Ông vừa phát âm hay vừa nguyền rủa cái từ đó vậy?",
-"Thôi xong. Cú này người bản xứ nghe xong cũng phải hỏi lại bằng tiếng Việt.",
-"Má ơi, đọc nhanh không có nghĩa là nuốt luôn nửa cái từ.",
-"Đừng có đoán mò nữa. Nghe mẫu rồi đọc lại cho tử tế.",
-"Vãi thật, cái từ đơn giản thế mà ông làm nó khổ quá.",
-"Nghe như ông vừa trượt chân giữa câu vậy. Làm lại!",
-"Đọc kiểu này thì từ điển cũng xin nghỉ việc.",
-"Không ổn đâu ông ơi. Cái âm cuối ông vứt đi đâu rồi?",
-"Địt mẹ, cái âm này không phải muốn đọc sao thì đọc đâu.",
-"Ông đang học phát âm hay đang phá phát âm vậy?",
-"Thôi, reset cái mồm rồi đọc lại từ đầu.",
-"Vãi cả tiếng Anh. Nghe mẫu đi rồi quay lại chiến tiếp."
+"Địt mẹ, đọc cái gì vậy? Đọc lại!",
+"Vãi lồn, sai bét rồi. Làm lại!",
+"Đọc như cứt. Nghe mẫu rồi đọc lại!",
+"Địt mẹ, cái âm này mà cũng đọc sai à?",
+"Vãi cả phát âm. Làm lại ngay!",
+"Má, đọc kiểu này ai mà hiểu nổi?",
+"Địt mẹ, nuốt hết âm rồi còn gì nữa?",
+"Sai vãi lồn. Đọc lại từ đầu!",
+"Đọc thế này thì nghỉ mẹ tiếng Anh đi!",
+"Địt mẹ, nghe kỹ rồi đọc cho đúng!",
+"Vãi đái, từ đơn giản mà đọc nát luôn!",
+"Đọc như này thì người bản xứ cũng chịu chết!",
+"Địt mẹ, âm cuối đâu? Nuốt mẹ nó rồi à?",
+"Sai quá sai. Làm lại!",
+"Vãi lồn, phát âm kiểu gì đấy?",
+"Đọc lại ngay. Đừng chế tiếng Anh nữa!",
+"Địt mẹ, từ có vậy mà cũng phá được!",
+"Đọc sai đến mức tao không biết mày đang nói từ gì!",
+"Vãi thật, làm lại từ đầu!",
+"Địt mẹ, nghe mẫu đi rồi hãy mở mồm!"
 ];
 const praise=[
 "Được! Chuẩn rồi.",
@@ -209,8 +209,8 @@ function speakFeedback(text){
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "vi-VN";
-  utter.rate = 1.32;
-  utter.pitch = 0.92;
+  utter.rate = 1.42;
+  utter.pitch = 0.88;
   utter.volume = 1;
 
   const vi = findVietnameseVoice();
@@ -224,8 +224,8 @@ function speakFeedback(text){
     try{
       const fallback = new SpeechSynthesisUtterance(text);
       fallback.lang = "vi-VN";
-      fallback.rate = 1.28;
-      fallback.pitch = 0.92;
+      fallback.rate = 1.38;
+      fallback.pitch = 0.88;
       fallback.volume = 1;
       speechSynthesis.speak(fallback);
     }catch(e){}
@@ -386,14 +386,14 @@ function makeRecognition(){
      setVoiceState("good");
      mascot.className="mascot";
      const goodVoice = rnd(praise);
-     queueVoice(goodVoice, 130);
-     setTimeout(next,1900);
+     queueVoice(goodVoice, 100);
+     setTimeout(next,1700);
    }else{
      result.className="result bad";
      setVoiceState("bad");
      mascot.className="mascot angry";
      const roastVoice = rnd(roasts);
-     queueVoice(roastVoice, 130);
+     queueVoice(roastVoice, 100);
    }
  };
 
