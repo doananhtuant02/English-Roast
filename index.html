@@ -28,7 +28,7 @@ button{font:inherit}.app{width:min(920px,calc(100% - 24px));margin:auto;padding:
 .bubble{width:min(560px,100%);padding:17px 18px;text-align:center;border:1px solid #31445e;border-radius:18px;background:#0d151f}
 .kicker{font-size:8px;font-weight:950;letter-spacing:1.5px;color:#8fa1ba}.word{margin:7px 0 2px;font-size:clamp(34px,8vw,54px);line-height:1;letter-spacing:-1px}.hint{margin:8px 0 0;color:#80b1ff;font-size:13px;font-weight:850}.meaning{margin:5px 0 0;color:#9facc0;font-size:11px}
 .result{width:min(650px,100%);min-height:66px;margin:15px 0 8px;padding:12px 15px;display:grid;place-items:center;text-align:center;border:1px dashed #364a64;border-radius:14px;background:#101925;color:#c7d0dd;font-weight:700;line-height:1.45}
-.result.good{border-color:rgba(72,209,125,.55);background:rgba(72,209,125,.1);color:#94efb4}.result.bad{border-color:rgba(255,89,100,.5);background:rgba(255,89,100,.1);color:#ff9da4;font-size:16px}
+.result.good{border-color:rgba(72,209,125,.55);background:rgba(72,209,125,.1);color:#94efb4}.result.bad{border-color:rgba(255,89,100,.5);background:rgba(255,89,100,.1);color:#ff9da4}
 .actions{display:flex;align-items:center;justify-content:center;gap:11px;margin-top:5px}.btn{min-height:44px;padding:0 15px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:#eef3fa;font-weight:850;cursor:pointer}.btn:hover{filter:brightness(1.08)}
 .mic{width:72px;height:72px;border:0;border-radius:50%;background:linear-gradient(135deg,#ff5964,#e93d4e);color:#fff;font-size:28px;cursor:pointer;box-shadow:0 12px 28px rgba(255,89,100,.26)}.mic.listening{background:linear-gradient(135deg,#48d17d,#23ad5d);animation:pulse 1s infinite}@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(72,209,125,.08)}}
 .diag{width:min(650px,100%);margin-top:13px;padding:10px 12px;border-radius:12px;background:#0d151f;border:1px solid #27364a;color:#718198;font-size:10px;line-height:1.5;text-align:center}
@@ -60,7 +60,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
       <div class="meaning" id="meaning"></div>
     </div>
 
-    <div class="result" id="result">Bấm micro và đọc từ phía trên.</div>
+    <div class="result" id="result" aria-live="off"><span id="voiceState">🎙️ Bấm mic để nói</span></div>
 
     <div class="actions">
       <button class="btn" id="listenBtn">🔊 Nghe mẫu</button>
@@ -69,7 +69,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     </div>
 
     <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
-    <div class="note">Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+    <div class="note"><b>V5:</b> Phản hồi được ép sang voice tiếng Việt (vi-VN), không hiện câu khen/chửi bằng chữ.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
   </section>
 
   <section class="words">
@@ -77,7 +77,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     <div class="grid" id="grid"></div>
   </section>
 
-  <footer>English Roast V2 · Live Server Edition</footer>
+  <footer>English Roast V5 · Vietnamese Voice</footer>
 </main>
 
 <script>
@@ -109,7 +109,7 @@ const roasts=[
 ];
 const praise=["Chuẩn bài 😎","Ngon! 🔥","Ổn áp rồi đó.","Được đấy, qua từ tiếp!","Yes! Không bị chửi nữa 😌"];
 
-let current=0,score=0,recognition=null,busy=false;
+let current=0,score=0,recognition=null,busy=false,micPermissionGranted=false;
 const $=id=>document.getElementById(id);
 const result=$("result"),diag=$("diag"),mic=$("micBtn"),mascot=$("mascot");
 
@@ -117,7 +117,7 @@ function lesson(){return lessons[current]}
 function render(){
  const x=lesson();
  $("word").textContent=x[0];$("hint").textContent=x[1];$("meaning").textContent=x[2];
- result.className="result";result.textContent="Bấm micro và đọc từ phía trên.";mascot.className="mascot";
+ result.className="result";setVoiceState("idle");mascot.className="mascot";
  $("grid").innerHTML=lessons.map((x,i)=>`<button class="item ${i===current?"active":""}" data-i="${i}"><strong>${x[0]}</strong><small>${x[2]}</small></button>`).join("");
  document.querySelectorAll(".item").forEach(b=>b.onclick=()=>{current=+b.dataset.i;render();scrollTo({top:0,behavior:"smooth"})});
 }
@@ -132,13 +132,133 @@ function sim(a,b){
 }
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 
+
+let cachedVietnameseVoice = null;
+let voicesReady = false;
+
+function pickVietnameseVoice(){
+  const voices = speechSynthesis.getVoices() || [];
+
+  const preferredNames = [
+    "Google Tiếng Việt",
+    "Microsoft HoaiMy",
+    "Microsoft NamMinh",
+    "Vietnamese",
+    "Tiếng Việt"
+  ];
+
+  let voice =
+    voices.find(v => preferredNames.some(name =>
+      (v.name || "").toLowerCase().includes(name.toLowerCase())
+    )) ||
+    voices.find(v => /^vi(-|_)/i.test(v.lang || "")) ||
+    voices.find(v => /vietnam|tiếng việt|tieng viet/i.test(v.name || ""));
+
+  if(voice){
+    cachedVietnameseVoice = voice;
+  }
+
+  return voice || null;
+}
+
+function preloadVietnameseVoice(){
+  if(!("speechSynthesis" in window)) return;
+
+  const found = pickVietnameseVoice();
+  if(found){
+    voicesReady = true;
+    return;
+  }
+
+  speechSynthesis.onvoiceschanged = ()=>{
+    const v = pickVietnameseVoice();
+    if(v) voicesReady = true;
+  };
+
+  // Some mobile browsers populate voices only after getVoices() is called repeatedly.
+  setTimeout(()=>pickVietnameseVoice(), 250);
+  setTimeout(()=>pickVietnameseVoice(), 700);
+  setTimeout(()=>pickVietnameseVoice(), 1400);
+}
+
+function speakFeedback(text){
+  if(!("speechSynthesis" in window)) return;
+
+  speechSynthesis.cancel();
+
+  const speakNow = ()=>{
+    const utter = new SpeechSynthesisUtterance(text);
+
+    // Force Vietnamese language metadata.
+    utter.lang = "vi-VN";
+    utter.rate = 1.0;
+    utter.pitch = 1.0;
+    utter.volume = 1;
+
+    const voice = cachedVietnameseVoice || pickVietnameseVoice();
+    if(voice){
+      utter.voice = voice;
+      utter.lang = voice.lang || "vi-VN";
+    }
+
+    speechSynthesis.speak(utter);
+  };
+
+  const voice = cachedVietnameseVoice || pickVietnameseVoice();
+
+  if(voice){
+    speakNow();
+    return;
+  }
+
+  // Wait briefly for voiceschanged on mobile before falling back.
+  let spoken = false;
+
+  const finish = ()=>{
+    if(spoken) return;
+    spoken = true;
+    speakNow();
+  };
+
+  const oldHandler = speechSynthesis.onvoiceschanged;
+  speechSynthesis.onvoiceschanged = ()=>{
+    pickVietnameseVoice();
+    if(typeof oldHandler === "function"){
+      try{ oldHandler(); }catch(e){}
+    }
+    finish();
+  };
+
+  setTimeout(finish, 800);
+}
+
+function setVoiceState(type){
+  const voiceState = document.getElementById("voiceState");
+  if(!voiceState) return;
+
+  if(type==="listening"){
+    voiceState.textContent="🎧 Đang nghe...";
+  }else if(type==="good"){
+    voiceState.textContent="✅";
+  }else if(type==="bad"){
+    voiceState.textContent="😈";
+  }else if(type==="error"){
+    voiceState.textContent="⚠️";
+  }else{
+    voiceState.textContent="🎙️ Bấm mic để nói";
+  }
+}
+
 function diagnostics(){
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
  const secure=window.isSecureContext;
  const media=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
  if(SR&&secure&&media){
    diag.className="diag ok";
-   diag.textContent="✅ Sẵn sàng: trình duyệt hỗ trợ mic + Speech Recognition.";
+   const viVoice = cachedVietnameseVoice || pickVietnameseVoice();
+   diag.textContent = viVoice
+     ? "✅ Mic sẵn sàng · Voice phản hồi: " + viVoice.name + " (" + viVoice.lang + ")"
+     : "✅ Mic sẵn sàng · Đang tải giọng tiếng Việt...";
  }else{
    diag.className="diag err";
    const issues=[];
@@ -156,43 +276,93 @@ async function ensureMicPermission(){
  stream.getTracks().forEach(t=>t.stop());
 }
 
+function destroyRecognition(){
+  if(!recognition)return;
+  try{
+    recognition.onstart=null;
+    recognition.onend=null;
+    recognition.onerror=null;
+    recognition.onresult=null;
+    recognition.abort();
+  }catch(e){}
+  recognition=null;
+}
+
 function makeRecognition(){
  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
  if(!SR)return null;
+
  const r=new SR();
  r.lang="en-US";
  r.interimResults=false;
  r.continuous=false;
  r.maxAlternatives=5;
- r.onstart=()=>{busy=true;mic.classList.add("listening");result.className="result";result.textContent="🎧 Đang nghe... đọc ngay đi!";};
- r.onend=()=>{busy=false;mic.classList.remove("listening")};
- r.onerror=e=>{
-   busy=false;mic.classList.remove("listening");result.className="result bad";
-   const map={
-    "not-allowed":"Micro đang bị chặn. Bấm ổ khóa cạnh URL → Microphone → Allow.",
-    "audio-capture":"Không tìm thấy microphone.",
-    "network":"Speech Recognition cần kết nối mạng. Kiểm tra Internet rồi thử lại.",
-    "no-speech":"Tôi chưa nghe thấy gì 😭 Nói to hơn một chút.",
-    "aborted":"Đã dừng nghe."
-   };
-   result.textContent=map[e.error]||("Lỗi nhận giọng nói: "+e.error);
+
+ r.onstart=()=>{
+   busy=true;
+   mic.disabled=true;
+   mic.classList.add("listening");
+   result.className="result";
+   setVoiceState("listening");
  };
+
+ r.onend=()=>{
+   busy=false;
+   mic.disabled=false;
+   mic.classList.remove("listening");
+   recognition=null;
+ };
+
+ r.onerror=e=>{
+   busy=false;
+   mic.disabled=false;
+   mic.classList.remove("listening");
+
+   const map={
+    "not-allowed":"Micro đang bị chặn. Bấm biểu tượng cạnh URL → Microphone → Allow.",
+    "audio-capture":"Không tìm thấy microphone.",
+    "network":"Speech Recognition cần Internet. Kiểm tra mạng rồi thử lại.",
+    "no-speech":"Tôi chưa nghe thấy gì 😭 Bấm mic rồi nói lại.",
+    "aborted":"Đã dừng nghe. Bấm mic để thử lại.",
+    "service-not-allowed":"Dịch vụ nhận giọng nói đang bị chặn trên trình duyệt."
+   };
+
+   result.className="result bad";
+   setVoiceState("error");
+   const errorVoice = map[e.error] || "Có lỗi nhận giọng nói. Bấm mic và thử lại.";
+   speakFeedback(errorVoice);
+   recognition=null;
+ };
+
  r.onresult=e=>{
    const alts=[];
-   for(let i=0;i<e.results[0].length;i++)alts.push(e.results[0][i].transcript);
+   for(let i=0;i<e.results[0].length;i++){
+     alts.push(e.results[0][i].transcript);
+   }
+
    const target=lesson()[0];
-   const best=alts.map(t=>({text:t,score:sim(t,target)})).sort((a,b)=>b.score-a.score)[0]||{text:"",score:0};
+   const best=alts
+      .map(t=>({text:t,score:sim(t,target)}))
+      .sort((a,b)=>b.score-a.score)[0]||{text:"",score:0};
+
    if(best.score>=.72){
-     score+=10;$("score").textContent=score;result.className="result good";
-     result.innerHTML=`✅ Tôi nghe: <strong>${best.text}</strong><br>${rnd(praise)}`;
+     score+=10;
+     $("score").textContent=score;
+     result.className="result good";
+     setVoiceState("good");
      mascot.className="mascot";
-     setTimeout(next,1700);
+     const goodVoice = rnd(praise);
+     speakFeedback(goodVoice);
+     setTimeout(next,2200);
    }else{
      result.className="result bad";
-     result.innerHTML=`❌ Tôi nghe: <strong>${best.text||"???"}</strong><br>${rnd(roasts)}`;
+     setVoiceState("bad");
      mascot.className="mascot angry";
+     const roastVoice = rnd(roasts);
+     speakFeedback(roastVoice);
    }
  };
+
  return r;
 }
 
@@ -207,22 +377,55 @@ $("nextBtn").onclick=next;
 
 mic.onclick=async()=>{
  if(busy)return;
+
  if(!diagnostics()){
-   result.className="result bad";
-   result.textContent="Chrome/Edge mới hỗ trợ tính năng mic của bản demo này.";
+   result.className="result bad";setVoiceState("error");speakFeedback("Hãy dùng Chrome hoặc Edge mới nhất để dùng microphone.");
    return;
  }
+
  try{
-   result.className="result";result.textContent="Đang xin quyền microphone...";
-   await ensureMicPermission();
-   if(!recognition)recognition=makeRecognition();
-   recognition.start();
+   mic.disabled=true;
+   result.className="result";setVoiceState("listening");
+
+   if(!micPermissionGranted){
+     await ensureMicPermission();
+     micPermissionGranted=true;
+   }
+
+   // Android Chrome: luôn tạo recognition MỚI cho mỗi lần bấm.
+   destroyRecognition();
+   recognition=makeRecognition();
+
+   if(!recognition){
+     mic.disabled=false;
+     result.className="result bad";setVoiceState("error");speakFeedback("Trình duyệt này không hỗ trợ nhận giọng nói.");
+     return;
+   }
+
+   // Delay nhẹ giúp Chrome Android giải phóng phiên recognition trước đó.
+   setTimeout(()=>{
+     try{
+       recognition.start();
+     }catch(err){
+       busy=false;
+       mic.disabled=false;
+       recognition=null;
+       result.className="result bad";setVoiceState("error");speakFeedback("Không bắt đầu được. Bấm mic lại một lần nữa.");
+     }
+   },180);
+
  }catch(err){
-   result.className="result bad";
-   result.textContent="Không mở được micro: "+(err.message||err)+". Kiểm tra quyền Microphone của trình duyệt.";
+   busy=false;
+   mic.disabled=false;
+   recognition=null;
+   result.className="result bad";setVoiceState("error");speakFeedback("Không mở được micro. Kiểm tra quyền microphone.");
  }
 };
 
+window.addEventListener("pagehide",destroyRecognition);
+window.addEventListener("beforeunload",destroyRecognition);
+
+preloadVietnameseVoice();
 diagnostics();
 render();
 });

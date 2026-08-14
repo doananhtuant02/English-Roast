@@ -1,17 +1,18 @@
-ENGLISH ROAST V2 - LIVE SERVER
+ENGLISH ROAST V5 - VIETNAMESE VOICE FIX
 
-Cách chạy:
-1. Giải nén ZIP.
-2. Mở thư mục English-Roast-V2-LiveServer bằng VS Code.
-3. Cài extension Live Server nếu chưa có.
-4. Chuột phải index.html -> Open with Live Server.
-5. Nên dùng Google Chrome hoặc Microsoft Edge.
-6. Khi bấm mic, chọn Allow microphone.
+Sửa lỗi:
+- V4 có thể nói câu roast bằng giọng tiếng Anh.
+- V5 chờ danh sách SpeechSynthesis voices tải xong.
+- Ưu tiên các voice có lang vi-VN / Vietnamese / Tiếng Việt.
+- Nếu tìm thấy, web khóa voice đó cho toàn bộ phản hồi tiếng Việt.
+- Nút "Nghe mẫu" vẫn cố ý dùng tiếng Anh (en-US) để đọc từ mẫu.
 
-Nếu mic vẫn lỗi:
-- Bấm biểu tượng ổ khóa bên trái thanh địa chỉ.
-- Site settings -> Microphone -> Allow.
-- Reload trang.
-- Đảm bảo máy có Internet vì Chrome Speech Recognition có thể dùng dịch vụ online.
+Cách cập nhật GitHub:
+1. Thay index.html trên repo English-Roast bằng index.html V5.
+2. Commit changes.
+3. Chờ GitHub Pages deploy.
+4. Mở tab mới hoặc reload trang trên điện thoại.
+5. Dòng trạng thái sẽ hiện tên voice đang dùng nếu tìm được.
 
-Bản V2 chỉ có 1 file index.html nên không thể lỗi đường dẫn CSS/JS.
+Nếu điện thoại không có voice tiếng Việt trong hệ thống, trình duyệt vẫn có thể fallback.
+Android thường cần bật/cài Text-to-Speech tiếng Việt trong cài đặt hệ thống.
