@@ -69,7 +69,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     </div>
 
     <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
-    <div class="note"><b>V6:</b> Web đóng mic hoàn toàn rồi mới phát voice để tránh lỗi im tiếng trên điện thoại.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+    <div class="note"><b>V7:</b> Roast mạnh hơn, voice nhanh và gắt hơn, phản hồi gần như ngay sau khi mic đóng.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
   </section>
 
   <section class="words">
@@ -77,7 +77,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     <div class="grid" id="grid"></div>
   </section>
 
-  <footer>English Roast V6 · Voice After Mic</footer>
+  <footer>English Roast V7 · Hard Roast</footer>
 </main>
 
 <script>
@@ -98,16 +98,34 @@ const lessons=[
 ];
 
 const roasts=[
-"Đọc lại đi cha nội 💀 Tiếng Anh chứ không phải thần chú gọi hồn.",
-"Ủa alo? Từ gốc một đường, ông đọc một nẻo vậy 😭",
-"Sai rồi má ơi 😭 Nghe mẫu lại rồi chiến tiếp.",
-"Cái miệng hôm nay phản chủ dữ vậy 😭",
-"Từ này bị ông hành tới mức nó muốn đổi quốc tịch luôn rồi.",
-"Ủa mình học tiếng Anh hay vừa phát minh ngôn ngữ mới vậy?",
-"Cú phát âm này hơi báo nha 💀 Làm lại!",
-"Người Anh nghe cú này chắc phải bật phụ đề 😭"
+"Địt mẹ, đọc cái gì vậy trời? Đọc lại!",
+"Vãi cả phát âm. Từ có một chữ mà ông bẻ thành ba chữ luôn rồi.",
+"Ông đọc kiểu này người ta nghe xong tưởng mạng lag đấy.",
+"Đọc lại đi cha nội. Cái miệng đừng có tự chế tiếng Anh nữa.",
+"Trời ơi, phát âm như này mà đi gọi đồ ăn là nhịn đói luôn.",
+"Vãi chưởng, từ này bị ông hành đến biến dạng luôn rồi.",
+"Không. Sai bét. Nghe lại rồi đọc cho đàng hoàng.",
+"Ủa alo? Đây là tiếng Anh, không phải mật mã hành tinh khác.",
+"Ông vừa phát âm hay vừa nguyền rủa cái từ đó vậy?",
+"Thôi xong. Cú này người bản xứ nghe xong cũng phải hỏi lại bằng tiếng Việt.",
+"Má ơi, đọc nhanh không có nghĩa là nuốt luôn nửa cái từ.",
+"Đừng có đoán mò nữa. Nghe mẫu rồi đọc lại cho tử tế.",
+"Vãi thật, cái từ đơn giản thế mà ông làm nó khổ quá.",
+"Nghe như ông vừa trượt chân giữa câu vậy. Làm lại!",
+"Đọc kiểu này thì từ điển cũng xin nghỉ việc.",
+"Không ổn đâu ông ơi. Cái âm cuối ông vứt đi đâu rồi?",
+"Địt mẹ, cái âm này không phải muốn đọc sao thì đọc đâu.",
+"Ông đang học phát âm hay đang phá phát âm vậy?",
+"Thôi, reset cái mồm rồi đọc lại từ đầu.",
+"Vãi cả tiếng Anh. Nghe mẫu đi rồi quay lại chiến tiếp."
 ];
-const praise=["Chuẩn bài 😎","Ngon! 🔥","Ổn áp rồi đó.","Được đấy, qua từ tiếp!","Yes! Không bị chửi nữa 😌"];
+const praise=[
+"Được! Chuẩn rồi.",
+"Ừ, lần này ngon.",
+"Đúng. Qua từ tiếp.",
+"Ổn đấy. Tiếp!",
+"Được rồi, khỏi ăn chửi."
+];
 
 let current=0,score=0,recognition=null,busy=false,micPermissionGranted=false;
 const $=id=>document.getElementById(id);
@@ -140,6 +158,20 @@ let pendingVoiceDelay = 260;
 function findVietnameseVoice(){
   if(!("speechSynthesis" in window)) return null;
   const voices = speechSynthesis.getVoices() || [];
+
+  const preferred = [
+    /NamMinh/i,
+    /Vietnamese.*Male/i,
+    /male.*Vietnamese/i,
+    /Google Tiếng Việt/i,
+    /Tiếng Việt/i,
+    /Vietnamese/i
+  ];
+
+  for(const rule of preferred){
+    const found = voices.find(v => rule.test((v.name||"") + " " + (v.lang||"")));
+    if(found) return found;
+  }
 
   return (
     voices.find(v => /^vi(-|_)/i.test(v.lang || "")) ||
@@ -177,8 +209,8 @@ function speakFeedback(text){
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "vi-VN";
-  utter.rate = 0.96;
-  utter.pitch = 1.0;
+  utter.rate = 1.32;
+  utter.pitch = 0.92;
   utter.volume = 1;
 
   const vi = findVietnameseVoice();
@@ -192,7 +224,8 @@ function speakFeedback(text){
     try{
       const fallback = new SpeechSynthesisUtterance(text);
       fallback.lang = "vi-VN";
-      fallback.rate = 0.96;
+      fallback.rate = 1.28;
+      fallback.pitch = 0.92;
       fallback.volume = 1;
       speechSynthesis.speak(fallback);
     }catch(e){}
@@ -206,7 +239,7 @@ function speakFeedback(text){
   },30);
 }
 
-function queueVoice(text, delay=260){
+function queueVoice(text, delay=150){
   pendingVoiceText = text || "";
   pendingVoiceDelay = delay;
 }
@@ -353,14 +386,14 @@ function makeRecognition(){
      setVoiceState("good");
      mascot.className="mascot";
      const goodVoice = rnd(praise);
-     queueVoice(goodVoice, 240);
-     setTimeout(next,2400);
+     queueVoice(goodVoice, 130);
+     setTimeout(next,1900);
    }else{
      result.className="result bad";
      setVoiceState("bad");
      mascot.className="mascot angry";
      const roastVoice = rnd(roasts);
-     queueVoice(roastVoice, 240);
+     queueVoice(roastVoice, 130);
    }
  };
 

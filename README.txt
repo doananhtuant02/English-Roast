@@ -1,23 +1,20 @@
-ENGLISH ROAST V6 - VOICE AFTER MIC
+ENGLISH ROAST V7 - HARD ROAST / FAST VOICE
 
-Sửa lỗi V5 không phát tiếng trên điện thoại.
+Thay đổi:
+- Roast mạnh hơn, có một số câu chửi tục nhẹ.
+- Voice phản hồi nhanh hơn: rate khoảng 1.32.
+- Pitch thấp hơn một chút để giọng gắt hơn.
+- Ưu tiên voice tiếng Việt nam nếu thiết bị có (NamMinh / Vietnamese Male).
+- Delay sau khi mic đóng giảm xuống khoảng 130ms.
+- Câu khen rút ngắn để nhịp học nhanh hơn.
 
-Cơ chế mới:
-1. Bấm mic.
-2. Web mở Speech Recognition.
-3. Người dùng nói.
-4. Web chấm đúng/sai nhưng CHƯA phát voice ngay.
-5. Speech Recognition kết thúc và giải phóng microphone.
-6. Sau khoảng 240ms, web mới phát câu khen/cà khịa bằng SpeechSynthesis.
-
-Ngoài ra:
-- TTS được "unlock" ngay từ lần bấm mic đầu tiên.
-- Không còn chờ voice tiếng Việt theo kiểu V5.
-- Nếu máy có voice vi-VN thì tự dùng.
-- Nếu không có, trình duyệt vẫn cố phát với lang=vi-VN.
+Lưu ý:
+SpeechSynthesis của trình duyệt không thể clone chính xác giọng trong video.
+V7 chỉ mô phỏng phong cách: nhanh, dồn, hơi gắt/cà khịa.
+Voice thực tế phụ thuộc voice TTS có sẵn trên điện thoại.
 
 Cập nhật GitHub:
-- Thay index.html cũ bằng index.html V6.
-- Commit changes.
-- Chờ Pages deploy lại.
-- Mở website bằng TAB MỚI trên điện thoại.
+1. Thay index.html cũ bằng index.html V7.
+2. Commit changes.
+3. Chờ Pages deploy.
+4. Mở tab mới trên điện thoại.
