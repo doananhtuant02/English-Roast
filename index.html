@@ -69,7 +69,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     </div>
 
     <div class="diag" id="diag">Đang kiểm tra trình duyệt...</div>
-    <div class="note"><b>V5:</b> Phản hồi được ép sang voice tiếng Việt (vi-VN), không hiện câu khen/chửi bằng chữ.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
+    <div class="note"><b>V6:</b> Web đóng mic hoàn toàn rồi mới phát voice để tránh lỗi im tiếng trên điện thoại.<br><br>Nếu bấm mic không được: dùng <b>Chrome hoặc Edge</b>, mở bằng <b>Live Server</b>, rồi bấm biểu tượng ổ khóa cạnh địa chỉ web → Microphone → Allow.</div>
   </section>
 
   <section class="words">
@@ -77,7 +77,7 @@ footer{text-align:center;color:#56667b;font-size:9px;padding-top:8px}
     <div class="grid" id="grid"></div>
   </section>
 
-  <footer>English Roast V5 · Vietnamese Voice</footer>
+  <footer>English Roast V6 · Voice After Mic</footer>
 </main>
 
 <script>
@@ -133,103 +133,106 @@ function sim(a,b){
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 
 
-let cachedVietnameseVoice = null;
-let voicesReady = false;
 
-function pickVietnameseVoice(){
+let pendingVoiceText = "";
+let pendingVoiceDelay = 260;
+
+function findVietnameseVoice(){
+  if(!("speechSynthesis" in window)) return null;
   const voices = speechSynthesis.getVoices() || [];
 
-  const preferredNames = [
-    "Google Tiếng Việt",
-    "Microsoft HoaiMy",
-    "Microsoft NamMinh",
-    "Vietnamese",
-    "Tiếng Việt"
-  ];
-
-  let voice =
-    voices.find(v => preferredNames.some(name =>
-      (v.name || "").toLowerCase().includes(name.toLowerCase())
-    )) ||
+  return (
     voices.find(v => /^vi(-|_)/i.test(v.lang || "")) ||
-    voices.find(v => /vietnam|tiếng việt|tieng viet/i.test(v.name || ""));
+    voices.find(v => /vietnam|tiếng việt|tieng viet/i.test((v.name || "") + " " + (v.lang || ""))) ||
+    null
+  );
+}
 
-  if(voice){
-    cachedVietnameseVoice = voice;
+function unlockSpeech(){
+  if(!("speechSynthesis" in window)) return;
+  try{
+    speechSynthesis.cancel();
+    speechSynthesis.resume();
+
+    // Mobile browsers sometimes need one TTS call directly from a user gesture.
+    const u = new SpeechSynthesisUtterance(" ");
+    u.volume = 0.01;
+    u.rate = 1;
+    u.lang = "vi-VN";
+    speechSynthesis.speak(u);
+
+    setTimeout(()=>{
+      try{ speechSynthesis.cancel(); }catch(e){}
+    },80);
+  }catch(e){}
+}
+
+function speakFeedback(text){
+  if(!text || !("speechSynthesis" in window)) return;
+
+  try{
+    speechSynthesis.cancel();
+    speechSynthesis.resume();
+  }catch(e){}
+
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "vi-VN";
+  utter.rate = 0.96;
+  utter.pitch = 1.0;
+  utter.volume = 1;
+
+  const vi = findVietnameseVoice();
+  if(vi){
+    utter.voice = vi;
+    utter.lang = vi.lang || "vi-VN";
   }
 
-  return voice || null;
+  utter.onerror = ()=>{
+    // Last-resort fallback: try again without forcing a specific voice.
+    try{
+      const fallback = new SpeechSynthesisUtterance(text);
+      fallback.lang = "vi-VN";
+      fallback.rate = 0.96;
+      fallback.volume = 1;
+      speechSynthesis.speak(fallback);
+    }catch(e){}
+  };
+
+  setTimeout(()=>{
+    try{
+      speechSynthesis.resume();
+      speechSynthesis.speak(utter);
+    }catch(e){}
+  },30);
+}
+
+function queueVoice(text, delay=260){
+  pendingVoiceText = text || "";
+  pendingVoiceDelay = delay;
+}
+
+function flushQueuedVoice(){
+  if(!pendingVoiceText) return;
+
+  const text = pendingVoiceText;
+  const delay = pendingVoiceDelay;
+
+  pendingVoiceText = "";
+
+  // Important for mobile: wait until SpeechRecognition releases the audio session.
+  setTimeout(()=>{
+    speakFeedback(text);
+  }, delay);
 }
 
 function preloadVietnameseVoice(){
   if(!("speechSynthesis" in window)) return;
-
-  const found = pickVietnameseVoice();
-  if(found){
-    voicesReady = true;
-    return;
+  try{ speechSynthesis.getVoices(); }catch(e){}
+  if("onvoiceschanged" in speechSynthesis){
+    speechSynthesis.onvoiceschanged = ()=>{
+      try{ speechSynthesis.getVoices(); }catch(e){}
+    };
   }
-
-  speechSynthesis.onvoiceschanged = ()=>{
-    const v = pickVietnameseVoice();
-    if(v) voicesReady = true;
-  };
-
-  // Some mobile browsers populate voices only after getVoices() is called repeatedly.
-  setTimeout(()=>pickVietnameseVoice(), 250);
-  setTimeout(()=>pickVietnameseVoice(), 700);
-  setTimeout(()=>pickVietnameseVoice(), 1400);
-}
-
-function speakFeedback(text){
-  if(!("speechSynthesis" in window)) return;
-
-  speechSynthesis.cancel();
-
-  const speakNow = ()=>{
-    const utter = new SpeechSynthesisUtterance(text);
-
-    // Force Vietnamese language metadata.
-    utter.lang = "vi-VN";
-    utter.rate = 1.0;
-    utter.pitch = 1.0;
-    utter.volume = 1;
-
-    const voice = cachedVietnameseVoice || pickVietnameseVoice();
-    if(voice){
-      utter.voice = voice;
-      utter.lang = voice.lang || "vi-VN";
-    }
-
-    speechSynthesis.speak(utter);
-  };
-
-  const voice = cachedVietnameseVoice || pickVietnameseVoice();
-
-  if(voice){
-    speakNow();
-    return;
-  }
-
-  // Wait briefly for voiceschanged on mobile before falling back.
-  let spoken = false;
-
-  const finish = ()=>{
-    if(spoken) return;
-    spoken = true;
-    speakNow();
-  };
-
-  const oldHandler = speechSynthesis.onvoiceschanged;
-  speechSynthesis.onvoiceschanged = ()=>{
-    pickVietnameseVoice();
-    if(typeof oldHandler === "function"){
-      try{ oldHandler(); }catch(e){}
-    }
-    finish();
-  };
-
-  setTimeout(finish, 800);
 }
 
 function setVoiceState(type){
@@ -255,10 +258,7 @@ function diagnostics(){
  const media=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia);
  if(SR&&secure&&media){
    diag.className="diag ok";
-   const viVoice = cachedVietnameseVoice || pickVietnameseVoice();
-   diag.textContent = viVoice
-     ? "✅ Mic sẵn sàng · Voice phản hồi: " + viVoice.name + " (" + viVoice.lang + ")"
-     : "✅ Mic sẵn sàng · Đang tải giọng tiếng Việt...";
+   diag.textContent="✅ Mic sẵn sàng · Voice phản hồi sẽ phát sau khi mic đóng.";
  }else{
    diag.className="diag err";
    const issues=[];
@@ -311,6 +311,7 @@ function makeRecognition(){
    mic.disabled=false;
    mic.classList.remove("listening");
    recognition=null;
+   flushQueuedVoice();
  };
 
  r.onerror=e=>{
@@ -330,7 +331,7 @@ function makeRecognition(){
    result.className="result bad";
    setVoiceState("error");
    const errorVoice = map[e.error] || "Có lỗi nhận giọng nói. Bấm mic và thử lại.";
-   speakFeedback(errorVoice);
+   queueVoice(errorVoice, 180);
    recognition=null;
  };
 
@@ -352,14 +353,14 @@ function makeRecognition(){
      setVoiceState("good");
      mascot.className="mascot";
      const goodVoice = rnd(praise);
-     speakFeedback(goodVoice);
-     setTimeout(next,2200);
+     queueVoice(goodVoice, 240);
+     setTimeout(next,2400);
    }else{
      result.className="result bad";
      setVoiceState("bad");
      mascot.className="mascot angry";
      const roastVoice = rnd(roasts);
-     speakFeedback(roastVoice);
+     queueVoice(roastVoice, 240);
    }
  };
 
@@ -377,6 +378,8 @@ $("nextBtn").onclick=next;
 
 mic.onclick=async()=>{
  if(busy)return;
+
+ unlockSpeech();
 
  if(!diagnostics()){
    result.className="result bad";setVoiceState("error");speakFeedback("Hãy dùng Chrome hoặc Edge mới nhất để dùng microphone.");

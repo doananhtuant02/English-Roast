@@ -1,18 +1,23 @@
-ENGLISH ROAST V5 - VIETNAMESE VOICE FIX
+ENGLISH ROAST V6 - VOICE AFTER MIC
 
-Sửa lỗi:
-- V4 có thể nói câu roast bằng giọng tiếng Anh.
-- V5 chờ danh sách SpeechSynthesis voices tải xong.
-- Ưu tiên các voice có lang vi-VN / Vietnamese / Tiếng Việt.
-- Nếu tìm thấy, web khóa voice đó cho toàn bộ phản hồi tiếng Việt.
-- Nút "Nghe mẫu" vẫn cố ý dùng tiếng Anh (en-US) để đọc từ mẫu.
+Sửa lỗi V5 không phát tiếng trên điện thoại.
 
-Cách cập nhật GitHub:
-1. Thay index.html trên repo English-Roast bằng index.html V5.
-2. Commit changes.
-3. Chờ GitHub Pages deploy.
-4. Mở tab mới hoặc reload trang trên điện thoại.
-5. Dòng trạng thái sẽ hiện tên voice đang dùng nếu tìm được.
+Cơ chế mới:
+1. Bấm mic.
+2. Web mở Speech Recognition.
+3. Người dùng nói.
+4. Web chấm đúng/sai nhưng CHƯA phát voice ngay.
+5. Speech Recognition kết thúc và giải phóng microphone.
+6. Sau khoảng 240ms, web mới phát câu khen/cà khịa bằng SpeechSynthesis.
 
-Nếu điện thoại không có voice tiếng Việt trong hệ thống, trình duyệt vẫn có thể fallback.
-Android thường cần bật/cài Text-to-Speech tiếng Việt trong cài đặt hệ thống.
+Ngoài ra:
+- TTS được "unlock" ngay từ lần bấm mic đầu tiên.
+- Không còn chờ voice tiếng Việt theo kiểu V5.
+- Nếu máy có voice vi-VN thì tự dùng.
+- Nếu không có, trình duyệt vẫn cố phát với lang=vi-VN.
+
+Cập nhật GitHub:
+- Thay index.html cũ bằng index.html V6.
+- Commit changes.
+- Chờ Pages deploy lại.
+- Mở website bằng TAB MỚI trên điện thoại.
